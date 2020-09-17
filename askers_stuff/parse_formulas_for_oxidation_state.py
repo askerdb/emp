@@ -21,7 +21,6 @@ def formula2dict(formula):
 
         formula_dict[k] = int(v)
     
-    print(formula, formula_dict)
     return(formula_dict)
 
 
