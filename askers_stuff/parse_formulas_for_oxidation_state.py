@@ -41,7 +41,7 @@ dicts_from_formulas = [formula2dict(formula) for formula in formula_list]
 
 outdf = pd.DataFrame()
 outdf["id"] = data["id"]
-outdf["cox"] = [calculate_cOX(formula) for fomula in dicts_from_formulas]
+outdf["cox"] = [calculate_cOX(formula) for formula in dicts_from_formulas]
 outdf.to_csv("cox_output.csv")
 
 #for idx, formula in zip(data["id"].values, dicts_from_formulas):
