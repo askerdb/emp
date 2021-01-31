@@ -1,4 +1,4 @@
-library(vegan); library(cowplot); library(ape)
+library(vegan); library(cowplot); library(ape); library(ztable)
 siriusmfidabund = read.table("1907_EMPv2_INN_GNPS_quant.csv", sep = ",", header = T)
 #Explore MF identifications
 siriurmf = read.table("data/formula_identifications.tsv", sep = "\t", header = T)
@@ -75,7 +75,13 @@ ggplot(siriurmf, aes(x = retentionTimeInSeconds, y = ionMass, color = HalogenTyp
   facet_wrap(~HalogenType) + geom_point() + theme_bw()
 siriusmfidjoint = merge(siriusmfid, siriusmfidabund, by.x = "shared_id", by.y = "row.ID", sort = F )
 siriusmfidjoint$IntensitySum = rowSums(siriusmfidjoint[,33:837])
+#siriusmfidjoint$IntensityPercentile =  sapply(siriusmfidjoint$IntensitySum, function(x) sum( x >siriusmfidjoint$IntensitySum)/ *100) #This is too complicated
 
 ggplot(siriusmfidjoint, aes(log10(IntensitySum), fill =  HalogenType)) + geom_density(alpha = 0.7) + facet_grid(HalogenType ~ .) + theme_bw()
 library(ztable);options(ztable.type="viewer")
-ztable(data.frame(table(siriusmfidjoint$HalogenType)), row)
+ztable(data.frame(table(siriusmfidjoint$HalogenType)))
+
+library(tidyr); library(dplyr)
+siriusmfidjointtop = subset(siriusmfidjoint, name != "null" & HalogenType != "Not halogen") %>% group_by(HalogenType) %>% top_n(n=10)
+siriusmfidjointtoppp = siriusmfidjointtop[, c("HalogenType", "name", "molecularFormula", "IntensitySum")][order(siriusmfidjointtop$HalogenType,siriusmfidjointtop$IntensitySum),]
+ztable(data.frame(siriusmfidjointtoppp))
