@@ -96,8 +96,8 @@ ggplot(siriurmfjointhaldistfitjoint, aes(x = Axis.1, y = Axis.2, color = empo_2)
 
 
 ggplot(siriurmfjointhaldistfitjoint, aes(x = Axis.1, y = Axis.2, color = empo_2)) + geom_point() + theme_bw() + 
-  geom_segment(data = data.frame(U), aes(x = 0, y = 0, xend = Axis.1, yend = Axis.2), arrow = arrow(length = unit(0.5, "cm")), inherit.aes = F) + 
-  geom_text(data = data.frame(U), aes(x = Axis.1, y = Axis.2, label = Halogen), inherit.aes = F) + facet_wrap(~emp500_title)
+  geom_segment(data = data.frame(U), aes(x = 0, y = 0, xend = Axis.1, yend = Axis.2), arrow = arrow(length = unit(0.2, "cm")), color = "grey", linetype = "dashed", inherit.aes = F) + 
+  geom_text(data = data.frame(U), aes(x = Axis.1, y = Axis.2, label = Halogen),color = "grey", inherit.aes = F) + facet_wrap(~emp500_title)
 
 
 #Explore identified compounds
