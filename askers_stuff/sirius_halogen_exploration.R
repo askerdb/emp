@@ -56,7 +56,7 @@ siriusmeta = read.table("qiime2_metadata.tsv", sep = "\t", header =T, comment.ch
 siriusmeta$new_filename = gsub("\\.", "_", sub(".mzML", "", gsub("-", "_", siriusmeta$metabo_v2_filename_2019)))
 siriushalojoint = merge(t(siriurmfjointhalonly), siriusmeta, by.x = 0, by.y = "new_filename")
 row.names(siriushalojoint) = siriushalojoint$Row.names; siriushalojoint$Row.names = NULL
-siriushalojointabund =  siriushalojoint[, 1:(ncol(siriushalojoint) - ncol(siriusmeta))]
+siriushalojointabund =  siriushalojoint[, 1:(ncol(siriushalojoint) - ncol(siriusmeta)+1)]
 siriurmfjointhaldist = vegdist(siriushalojointabund)
 siriurmfjointhaldistfit = pcoa(siriurmfjointhaldist)
 plot(siriurmfjointhaldistfit$values$Relative_eig[1:10]*100, ylab = "Percent variance explained", xlab = "Principal coordinate", main = "Scree plot")
@@ -64,6 +64,41 @@ siriurmfjointhaldistfitjoint = data.frame(siriurmfjointhaldistfit$vectors[,1:2],
 ggplot(siriurmfjointhaldistfitjoint, aes(x = Axis.1, y = Axis.2, color = empo_2)) + geom_point() + theme_bw()
 
 ggplot(siriurmfjointhaldistfitjoint, aes(x = Axis.1, y = Axis.2, color = env_biome)) + geom_point() + theme_bw() + facet_wrap(~empo_3)
+
+#Project halogen type on pcoa
+
+siriurmfhalotype = merge(t(siriushalojointabund), siriurmfjointhal,  by = 0, sort = F, all.x = T)
+
+siriurmfjointhalagg = aggregate(t(siriushalojointabund), by = list(siriurmfhalotype$HalogenType), FUN = sum )
+row.names(siriurmfjointhalagg) = siriurmfjointhalagg$Group.1;siriurmfjointhalagg$Group.1 = NULL
+siriurmfjointhalaggn = sweep(siriurmfjointhalagg, 2,  colSums(siriurmfjointhalagg),  FUN = '/')
+x = siriurmfjointhaldistfit
+Y = t(siriurmfjointhalaggn)
+plot.axes = c(1, 2)
+pr.coo <- x$vectors
+n <- nrow(Y)
+points.stand <- scale(pr.coo[, plot.axes])
+S <- cov(Y, points.stand)
+U <- S %*% diag((x$values$Eigenvalues[plot.axes]/(n - 
+                                                    1))^(-0.5))
+colnames(U) <- colnames(pr.coo[, plot.axes])
+U = data.frame(U)
+U$Halogen = row.names(U)
+
+hull <- siriurmfjointhaldistfitjoint %>%
+  group_by(lcms_batch) %>%
+  slice(chull(Axis.1, Axis.2))
+
+ggplot(siriurmfjointhaldistfitjoint, aes(x = Axis.1, y = Axis.2, color = empo_2)) + geom_point() + theme_bw() + 
+  geom_segment(data = data.frame(U), aes(x = 0, y = 0, xend = Axis.1, yend = Axis.2), arrow = arrow(length = unit(0.5, "cm")), inherit.aes = F) + 
+  geom_label(data = data.frame(U), aes(x = Axis.1, y = Axis.2, label = Halogen), inherit.aes = F) + stat_ellipse(aes(group = lcms_samplingmethod, linetype = lcms_samplingmethod))
+  #geom_polygon(data = hull, alpha = 0.5)
+
+
+ggplot(siriurmfjointhaldistfitjoint, aes(x = Axis.1, y = Axis.2, color = empo_2)) + geom_point() + theme_bw() + 
+  geom_segment(data = data.frame(U), aes(x = 0, y = 0, xend = Axis.1, yend = Axis.2), arrow = arrow(length = unit(0.5, "cm")), inherit.aes = F) + 
+  geom_text(data = data.frame(U), aes(x = Axis.1, y = Axis.2, label = Halogen), inherit.aes = F) + facet_wrap(~emp500_title)
+
 
 #Explore identified compounds
 siriusmfid = read.table("data/compound_identifications.tsv", sep = "\t", header = T, comment.char = "")
@@ -77,10 +112,12 @@ siriusmfidjoint = merge(siriusmfid, siriusmfidabund, by.x = "shared_id", by.y = 
 siriusmfidjoint$IntensitySum = rowSums(siriusmfidjoint[,33:837])
 #siriusmfidjoint$IntensityPercentile =  sapply(siriusmfidjoint$IntensitySum, function(x) sum( x >siriusmfidjoint$IntensitySum)/ *100) #This is too complicated
 
+#table of halogen type counts
 ggplot(siriusmfidjoint, aes(log10(IntensitySum), fill =  HalogenType)) + geom_density(alpha = 0.7) + facet_grid(HalogenType ~ .) + theme_bw()
 library(ztable);options(ztable.type="viewer")
 ztable(data.frame(table(siriusmfidjoint$HalogenType)))
 
+#Top abundant compounds of each type
 library(tidyr); library(dplyr)
 siriusmfidjointtop = subset(siriusmfidjoint, name != "null" & HalogenType != "Not halogen") %>% group_by(HalogenType) %>% top_n(n=10)
 siriusmfidjointtoppp = siriusmfidjointtop[, c("HalogenType", "name", "molecularFormula", "IntensitySum")][order(siriusmfidjointtop$HalogenType,siriusmfidjointtop$IntensitySum),]
