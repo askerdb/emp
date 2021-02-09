@@ -1,0 +1,28 @@
+empo_0;empo_1;empo_2;empo_3
+EMP sample;Free-living;Non-saline;Water (non-saline)
+EMP sample;Free-living;Non-saline;Sediment (non-saline)
+EMP sample;Free-living;Non-saline;Soil (non-saline)
+EMP sample;Free-living;Non-saline;Surface (non-saline)
+EMP sample;Free-living;Non-saline;Subsurface (non-saline)
+EMP sample;Free-living;Non-saline;Aerosol (non-saline)
+EMP sample;Free-living;Saline;Water (saline)
+EMP sample;Free-living;Saline;Sediment (saline)
+EMP sample;Free-living;Saline;Hypersaline (saline)
+EMP sample;Free-living;Saline;Surface (saline)
+EMP sample;Free-living;Saline;Aerosol (saline)
+EMP sample;Host-associated;Animal;Animal distal gut
+EMP sample;Host-associated;Animal;Animal proximal gut
+EMP sample;Host-associated;Animal;Animal secretion
+EMP sample;Host-associated;Animal;Animal surface
+EMP sample;Host-associated;Animal;Animal corpus
+EMP sample;Host-associated;Plant;Plant secretion
+EMP sample;Host-associated;Plant;Plant surface
+EMP sample;Host-associated;Plant;Plant rhizosphere
+EMP sample;Host-associated;Plant;Plant corpus
+EMP sample;Host-associated;Fungus;Fungus corpus
+EMP sample;Host-associated;Fungus;Fungus surface
+EMP sample;Control;Negative;Sterile water blank
+EMP sample;Control;Positive;Single strain
+EMP sample;Control;Positive;Mock community
+EMP sample;Unknown;Contradictory;Unknown (contradictory)
+EMP sample;Unknown;Missing;Unknown (missing)
